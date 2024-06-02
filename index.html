@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generator Permutasi</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    transition: background-color 0.5s ease;
+  }
+  .container {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 15px;
+    width: 300px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+  }
+  .title {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    color: #333333;
+  }
+  input[type="text"] {
+    width: 85%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    font-size: 1em;
+  }
+  button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #0056b3;
+  }
+  .output {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    margin-bottom: 20px;
+    font-size: 1.1em;
+    color: #333333;
+  }
+  .explanation {
+    font-size: 0.9em;
+    line-height: 1.5;
+    color: #666666;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="title">Generator Permutasi</div>
+  <input type="text" id="inputString" placeholder="Masukkan Sebuah String">
+  <button onclick="showPermute('backtracking')">Hasilkan Permutasi (Backtracking)</button>
+  <button onclick="showPermute('bruteforce')">Hasilkan Permutasi (Brute Force)</button>
+  <button onclick="exitApp()">Keluar</button>
+  <div class="output" id="output"></div>
+  <div class="explanation" id="explanation"></div>
+</div>
+
+<script>
+// Fungsi bantu untuk mengubah list menjadi string
+function toString(list) {
+  return list.join('');
+}
+
+// Fungsi permutasi backtracking
+function permuteBacktracking(a, l, r, result) {
+  if (l == r) {
+    result.push(toString(a));
+  } else {
+    for (let i = l; i < r; i++) {
+      [a[l], a[i]] = [a[i], a[l]];
+      permuteBacktracking(a, l + 1, r, result);
+      [a[l], a[i]] = [a[i], a[l]]; // backtrack
+    }
+  }
+}
+
+// Fungsi permutasi brute force
+function permuteBruteForce(str) {
+  // Menghasilkan semua permutasi dari string
+  var permutations = [];
+  var array = str.split('');
+  var length = array.length;
+  var c = new Array(length).fill(0);
+  permutations.push(str);
+
+  var i = 1, k, p;
+  while (i < length) {
+    if (c[i] < i) {
+      k = i % 2 && c[i];
+      p = array[i];
+      array[i] = array[k];
+      array[k] = p;
+      ++c[i];
+      i = 1;
+      permutations.push(array.join(''));
+    } else {
+      c[i] = 0;
+      ++i;
+    }
+  }
+  return permutations;
+}
+
+// Fungsi untuk menampilkan permutasi
+function showPermute(method) {
+  var inputField = document.getElementById('inputString');
+  var outputDiv = document.getElementById('output');
+  var explanationDiv = document.getElementById('explanation');
+  outputDiv.textContent = '';
+  explanationDiv.textContent = '';
+
+  var input = inputField.value;
+  var n = input.length;
+  var a = input.split('');
+
+  var startTime, endTime, duration;
+  if (method === 'backtracking') {
+    var result = [];
+    startTime = performance.now();
+    permuteBacktracking(a, 0, n, result);
+    endTime = performance.now();
+    duration = endTime
+    - startTime;
+    outputDiv.textContent = result.join(', ');
+    explanationDiv.textContent = 
+      'Algoritma Backtracking: \n' +
+      'Backtracking bekerja dengan menghasilkan semua kemungkinan permutasi secara rekursif. Pada setiap langkah, ia mencoba semua kemungkinan pertukaran karakter dan melanjutkan secara rekursif hingga semua permutasi dihasilkan. \n\n' +
+      'Kompleksitas Waktu: O(n!) karena setiap karakter dapat ditempatkan di setiap posisi dalam setiap rekursi. \n' +
+      'Penjelasan Kompleksitas: Algoritma ini menggunakan satu loop yang beriterasi sebanyak n kali untuk setiap panggilan rekursi. Dalam setiap iterasi, karakter dipertukarkan, dan rekursi dilakukan pada submasalah dengan panjang n-1. Oleh karena itu, kompleksitas keseluruhan adalah O(n!). \n' +
+      'Waktu eksekusi: ' + duration.toFixed(2) + ' milidetik';
+  } else if (method === 'bruteforce') {
+    startTime = performance.now();
+    var permutations = permuteBruteForce(input);
+    endTime = performance.now();
+    duration = endTime - startTime;
+    outputDiv.textContent = permutations.join(', ');
+    explanationDiv.textContent = 
+      'Algoritma Brute Force: \n' +
+      'Brute force menghasilkan semua permutasi string dengan mengulangi secara sistematis semua kemungkinan urutan karakter. Ini menukar karakter dan menyimpan semua permutasi yang dihasilkan hingga semua kemungkinan habis. \n\n' +
+      'Kompleksitas Waktu: O(n!) karena harus menghasilkan setiap kemungkinan permutasi dari string. \n' +
+      'Penjelasan Kompleksitas: Algoritma ini menggunakan satu loop utama yang beriterasi sebanyak n kali. Di dalam loop ini, terdapat operasi penukaran yang juga berjalan sebanyak n! kali karena harus menghasilkan semua permutasi. Oleh karena itu, kompleksitas waktu keseluruhan adalah O(n!). \n' +
+      'Waktu eksekusi: ' + duration.toFixed(2) + ' milidetik';
+  }
+}
+
+// Fungsi untuk keluar dari aplikasi
+function exitApp() {
+  window.close(); // Ini hanya akan berfungsi jika jendela dibuka melalui JavaScript
+}
+</script>
+</body>
+</html>
+
